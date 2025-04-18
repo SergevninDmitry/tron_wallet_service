@@ -10,7 +10,6 @@ class WalletRequestResponse(BaseModel):
     bandwidth: int
     energy: int
     balance: float
-    timestamp: str
 
     class Config:
         orm_mode = True
