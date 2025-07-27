@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from httpx import AsyncClient, ASGITransport
 
 from src.main import app
-from src.db import Base
+from src.db import Base, get_db
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
@@ -19,6 +19,16 @@ def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+@pytest_asyncio.fixture(autouse=True, scope="function")
+async def override_get_db_fixture():
+    async def override_get_db():
+        async with TestSessionLocal() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield
+    app.dependency_overrides.clear()
 
 
 @pytest_asyncio.fixture(scope="function")
