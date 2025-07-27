@@ -2,14 +2,16 @@ from pydantic import BaseModel, Field
 
 
 class WalletRequestCreate(BaseModel):
-    address: str = Field(..., example="TXYZ...")
+    address: str = Field(..., schema_extra={"example": "T..."})
 
 
 class WalletRequestResponse(BaseModel):
+    id: int
     address: str
     bandwidth: int
     energy: int
     balance: float
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
